@@ -1,31 +1,64 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Random Transformation</title>
-</head>
-<body>
-  <p>Choosing your transformation...</p>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Random Transformation</title>
+    </head>
+    <body>
+        <p>Choosing your transformation...</p>
+        <script>
+            // ADD YOUR DEVIANTART LINKS HERE
+            const links = [
+                "https://www.deviantart.com/stash/0x07zggnu48", //#1 Princess
+                "https://www.deviantart.com/stash/0gkzs6x3klv", //#2 Magical Girl
+                "https://www.deviantart.com/stash/01wsrwftasf", //#3 Catgirl Maid
+                "https://www.deviantart.com/stash/01exsaxzuc18", //#4 Cheerleader
+                "https://www.deviantart.com/stash/01wimbz9krd5", //#5 Japanese Schoolgirl
+                "https://www.deviantart.com/stash/0kajzrqpllw", //#6 Ballerina
+                "https://www.deviantart.com/stash/0gnpeo8vmlw", //#7 Clown
+                "https://www.deviantart.com/stash/01082da8ha38", //#8 Bride
+                "https://www.deviantart.com/stash/01h43brr8u3u", //#9 Playboy Bunny
+                "https://www.deviantart.com/stash/01k5ujknn835", //#10 Witch
+            ];
 
-  <script>
-    // ADD YOUR DEVIANTART LINKS HERE
-    const links = [
-      "https://www.deviantart.com/stash/0x07zggnu48"    //#1 Princess
-      ,"https://www.deviantart.com/stash/0gkzs6x3klv"   //#2 Magical Girl
-      ,"https://www.deviantart.com/stash/01wsrwftasf"   //#3 Catgirl Maid
-      ,"https://www.deviantart.com/stash/01exsaxzuc18"  //#4 Cheerleader
-      ,"https://www.deviantart.com/stash/01wimbz9krd5"  //#5 Japanese Schoolgirl
-      ,"https://www.deviantart.com/stash/0kajzrqpllw"   //#6 Ballerina
-      ,"https://www.deviantart.com/stash/0gnpeo8vmlw"   //#7 Clown
-      ,"https://www.deviantart.com/stash/01082da8ha38"  //#8 Bride
-      ,"https://www.deviantart.com/stash/01h43brr8u3u"  //#9 Playboy Bunny
-      ,"https://www.deviantart.com/stash/01k5ujknn835"  //#10 Witch
-    ];
+            const key = "transformationShuffleBag";
 
-    // Pick one at random and go there
-    const random = Math.floor(Math.random() * links.length);
-    window.location.replace(links[random]);
-  </script>
-</body>
+            // Retrieve the previous shuffle state
+            let state = {};
+            try {
+                state = JSON.parse(localStorage.getItem(key)) || {};
+            } catch (e) {}
+
+            // Reset when the list of transformations changes
+            if (JSON.stringify(state.links) !== JSON.stringify(links)) {
+                state = { links, remaining: [], last: -1 };
+            }
+
+            // Refill and shuffle when the bag is empty
+            if (state.remaining.length === 0) {
+                state.remaining = links.map((_, i) => i);
+
+                for (let i = state.remaining.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [state.remaining[i], state.remaining[j]] = [state.remaining[j], state.remaining[i]];
+                }
+
+                // Prevent repeats across shuffle boundaries
+                const end = state.remaining.length - 1;
+                if (end > 0 && state.remaining[end] === state.last) {
+                    [state.remaining[0], state.remaining[end]] = [state.remaining[end], state.remaining[0]];
+                }
+            }
+
+            // Draw the next transformation
+            const chosen = state.remaining.pop();
+            state.last = chosen;
+
+            // Remember the result and remaining choices
+            localStorage.setItem(key, JSON.stringify(state));
+
+            // Redirect!
+            window.location.replace(links[chosen]);
+        </script>
+    </body>
 </html>
