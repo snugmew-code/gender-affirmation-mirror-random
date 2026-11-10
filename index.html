@@ -1,0 +1,31 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Random Transformation</title>
+</head>
+<body>
+  <p>Choosing your transformation...</p>
+
+  <script>
+    // ADD YOUR DEVIANTART LINKS HERE
+    const links = [
+      "https://www.deviantart.com/stash/0x07zggnu48"    //#1 Princess
+      ,"https://www.deviantart.com/stash/0gkzs6x3klv"   //#2 Magical Girl
+      ,"https://www.deviantart.com/stash/01wsrwftasf"   //#3 Catgirl Maid
+      ,"https://www.deviantart.com/stash/01exsaxzuc18"  //#4 Cheerleader
+      ,"https://www.deviantart.com/stash/01wimbz9krd5"  //#5 Japanese Schoolgirl
+      ,"https://www.deviantart.com/stash/0kajzrqpllw"   //#6 Ballerina
+      ,"https://www.deviantart.com/stash/0gnpeo8vmlw"   //#7 Clown
+      ,"https://www.deviantart.com/stash/01082da8ha38"  //#8 Bride
+      ,"https://www.deviantart.com/stash/01h43brr8u3u"  //#9 Playboy Bunny
+      ,"https://www.deviantart.com/stash/01k5ujknn835"  //#10 Witch
+    ];
+
+    // Pick one at random and go there
+    const random = Math.floor(Math.random() * links.length);
+    window.location.replace(links[random]);
+  </script>
+</body>
+</html>
