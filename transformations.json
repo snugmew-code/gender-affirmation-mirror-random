@@ -65,5 +65,59 @@
     "name": "Gyaru",
     "url": "https://www.deviantart.com/stash/0i6b3ejx5oz",
     "enabled": true
-  }
+  },
+    {
+    "id": 12,
+    "name": "Goth",
+    "url": "https://www.deviantart.com/stash/01738acaeiw4",
+    "enabled": true
+  },
+    {
+    "id": 13,
+    "name": "Shion Yorigami",
+    "url": "https://www.deviantart.com/stash/07uxnhqymji",
+    "enabled": true
+  },
+    {
+    "id": 14,
+    "name": "Tomboy",
+    "url": "https://www.deviantart.com/stash/01nlbdaitsse",
+    "enabled": true
+  },
+    {
+    "id": 15,
+    "name": "Nurse",
+    "url": "https://www.deviantart.com/stash/01jxcjob3trr",
+    "enabled": true
+  },
+    {
+    "id": 16,
+    "name": "Ball-Jointed Doll",
+    "url": "https://www.deviantart.com/stash/01jm041lhy49",
+    "enabled": true
+  },
+    {
+    "id": 17,
+    "name": "Secretary",
+    "url": "https://www.deviantart.com/stash/019qaxjqen83",
+    "enabled": true
+  },
+    {
+    "id": 18,
+    "name": "Emo",
+    "url": "https://www.deviantart.com/stash/0ntdvov5y43",
+    "enabled": true
+  },
+    {
+    "id": 19,
+    "name": "Vampire",
+    "url": "https://www.deviantart.com/stash/0aapiin43dr",
+    "enabled": true
+  },
+    {
+    "id": 20,
+    "name": "Southern Belle",
+    "url": "https://www.deviantart.com/stash/01wwpjatrx6w",
+    "enabled": true
+  },
 ]
