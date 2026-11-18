@@ -100,7 +100,9 @@ button { cursor: pointer; }
 .viewer {
   min-height: 0; height: 100%;
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+  /* Artwork width follows the illustration's 1200 × 1312 aspect ratio,
+     while the story gets ALL remaining width. Never exceed 54% for art. */
+  grid-template-columns: fit-content(54%) minmax(0, 1fr);
   border: 1px solid var(--viewer-border);
   border-radius: 20px;
   overflow: hidden;
@@ -109,6 +111,9 @@ button { cursor: pointer; }
 }
 .art {
   min-width: 0; min-height: 0;
+  height: 100%;
+  aspect-ratio: 1200 / 1312;
+  max-width: 100%;
   background: radial-gradient(circle at 50% 40%, var(--art-glow), var(--art-background) 65%);
   display: flex; align-items: center; justify-content: center;
   position: relative; overflow: hidden;
@@ -195,6 +200,7 @@ button:focus-visible, select:focus-visible, a:focus-visible, .story:focus-visibl
 /* Narrow screens keep the artwork visible above an independently scrolling story. */
 @media (max-width: 760px) {
   .viewer { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 42%) minmax(0, 1fr); border-radius: 16px; }
+  .art { width: 100%; aspect-ratio: auto; }
   .details { padding: clamp(10px, 2vw, 18px); }
   h2 { font-size: clamp(1.25rem, 4vw, 1.75rem); }
   .controls { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; }
@@ -246,11 +252,11 @@ button:focus-visible, select:focus-visible, a:focus-visible, .story:focus-visibl
         <option value="">Choose a transformation…</option>
       </select>
 	  <div class="meta">
+        <span>by <a href="https://www.deviantart.com/smugmew" target="_blank" rel="noopener noreferrer">smugmew</a></span>
         <button type="button" class="theme-switch" id="theme-switch" role="switch" aria-label="Light mode" aria-checked="false">
-		  <span aria-hidden="true">Light mode ☀️</span>
+          <span aria-hidden="true">☀ Light</span>
           <span class="theme-switch-track" aria-hidden="true"><span class="theme-switch-thumb"></span></span>
         </button>
-		<span>by <a href="https://www.deviantart.com/smugmew" target="_blank" rel="noopener noreferrer">smugmew</a></span>
         <span id="app-version"></span>
       </div>
     </div>
@@ -267,7 +273,7 @@ button:focus-visible, select:focus-visible, a:focus-visible, .story:focus-visibl
     };
 
     // Update this whenever you publish a new version.
-    const APP_VERSION = "2026.11.18.2";
+    const APP_VERSION = "2026.11.18.3";
     document.getElementById("app-version").textContent = `v${APP_VERSION}`;
 
     // Honor a saved choice, but leave dark as the default.
