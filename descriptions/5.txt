@@ -42,7 +42,7 @@ And Yui-chan! You promised to show her your new hair clip tomorrow!
 
 Your expression suddenly becomes concerned.
 
-「あっ、宿題まだ終わってない！」
+“<abbr title="Ah, I haven't finished my homework yet!">A, shukudai mada owattenai!</abbr>”
 
 The words tumble from your lips without hesitation.
 
@@ -56,11 +56,11 @@ You make a tiny face.
 
 Why does English have to be so difficult? You studied all those vocabulary words yesterday, but you can barely remember half of them!
 
-「えっと…明日は英語の小テストもあるんだっけ…」
+“<abbr title="Um... I have an English quiz tomorrow too, don't I...?">Etto... ashita wa eigo no shō tesuto mo aru n dakke...</abbr>”
 
 You sigh.
 
-「もう、やだなぁ…」
+“<abbr title="Ugh, I really don't want to...">Mō, yada nā...</abbr>”
 
 More little details settle comfortably into place. The route you walk to school every morning. The convenience store near the station. The familiar voices of your classmates, the smell of lunch in the classroom, the rainy afternoons when you hurry home beneath your umbrella.
 
@@ -76,7 +76,7 @@ Wasn't there something you were excited about?
 
 Oh, right! Your hair!
 
-「うん、やっぱりかわいい！」
+“<abbr title="Yeah, it really is cute after all!">Un, yappari kawaii!</abbr>”
 
 You smile, carefully straightening your pink flower clip.
 
@@ -86,7 +86,7 @@ Much better.
 
 You're just an ordinary girl getting ready for bed, worrying about tomorrow's English quiz, hoping your friends will notice your cute hair clip, and wishing the weekend would hurry up already.
 
-「よしっ！明日も頑張ろう！」
+“<abbr title="All right! I'll do my best tomorrow too!">Yoshi! Ashita mo ganbarō!</abbr>”
 
 You give your reflection one last cheerful smile.
 
