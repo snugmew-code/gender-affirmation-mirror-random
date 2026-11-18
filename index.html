@@ -5,13 +5,77 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#11101a">
   <title>Gender Affirmation Mirror</title>
+  <script>
+    // Apply the saved choice before the page paints, avoiding a dark flash.
+    // Dark mode is always the default for new visitors.
+    try {
+      if (localStorage.getItem("gam-color-theme") === "light") {
+        document.documentElement.dataset.theme = "light";
+      }
+    } catch (_) { /* Storage may be unavailable in private browsing. */ }
+  </script>
   <style>
 
-:root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+/* Themes: all existing dark colors remain the default. */
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --page-color: #f4f0ff;
+  --page-glow: #302041;
+  --page-background: #11101a;
+  --muted-color: #bcaecb;
+  --link-color: #dfb9fc;
+  --link-hover: #fff;
+  --viewer-border: #4e405c;
+  --viewer-background: #201a2a;
+  --viewer-shadow: #0005;
+  --art-glow: #534266;
+  --art-background: #231b30;
+  --placeholder-color: #c1adc9;
+  --symbol-color: #9570af;
+  --count-color: #c9a9df;
+  --rule-color: #544760;
+  --story-color: #e4dce9;
+  --control-border: #5e506c;
+  --control-background: #292136;
+  --control-color: #f8f4fb;
+  --primary-background: #dbb4fc;
+  --primary-color: #21152c;
+  --focus-color: #e2bafa;
+  --switch-track: #5e506c;
+  --switch-thumb: #f8f4fb;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --page-color: #2f2438;
+  --page-glow: #e6d6f0;
+  --page-background: #faf8fd;
+  --muted-color: #5b4c67;
+  --link-color: #653586;
+  --link-hover: #46205c;
+  --viewer-border: #d7c7df;
+  --viewer-background: #fff;
+  --viewer-shadow: #46345322;
+  --art-glow: #f3eaf9;
+  --art-background: #ded0e9;
+  --placeholder-color: #6f5979;
+  --symbol-color: #9470a6;
+  --count-color: #75458d;
+  --rule-color: #e4d9eb;
+  --story-color: #32283a;
+  --control-border: #cbb8d8;
+  --control-background: #f5effa;
+  --control-color: #31253c;
+  --primary-background: #70418c;
+  --primary-color: #fff;
+  --focus-color: #8d4aab;
+  --switch-track: #b08ac7;
+  --switch-thumb: #fff;
+}
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { width: 100%; height: 100%; overflow: hidden; }
-body { margin: 0; color: #f4f0ff; background: radial-gradient(ellipse at 75% 0%, #302041 0, transparent 48%), #11101a; }
+body { margin: 0; color: var(--page-color); background: radial-gradient(ellipse at 75% 0%, var(--page-glow) 0, transparent 48%), var(--page-background); }
 button, select { font: inherit; }
 button { cursor: pointer; }
 
@@ -28,24 +92,24 @@ button { cursor: pointer; }
   min-height: 0;
 }
 .masthead { display: flex; flex-direction: column; align-items: center; gap: clamp(3px, .6vh, 8px); min-height: 0; }
-.meta { display: flex; align-items: center; justify-content: space-between; align-self: stretch; gap: 16px; color: #bcaecb; font-size: clamp(.68rem, 1.5vh, .83rem); line-height: 1.2; }
-.meta a { color: #dfb9fc; text-underline-offset: 3px; }
-.meta a:hover { color: #fff; }
+.meta { display: flex; align-items: center; justify-content: space-between; gap: clamp(9px, 1.3vw, 16px); margin-left: auto; color: var(--muted-color); font-size: clamp(.68rem, 1.5vh, .83rem); line-height: 1.2; }
+.meta a { color: var(--link-color); text-underline-offset: 3px; }
+.meta a:hover { color: var(--link-hover); }
 .logo { display: block; width: auto; height: clamp(28px, 10vh, 104px); max-width: 100%; object-fit: contain; }
 
 .viewer {
   min-height: 0; height: 100%;
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
-  border: 1px solid #4e405c;
+  border: 1px solid var(--viewer-border);
   border-radius: 20px;
   overflow: hidden;
-  background: #201a2a;
-  box-shadow: 0 18px 60px #0005;
+  background: var(--viewer-background);
+  box-shadow: 0 18px 60px var(--viewer-shadow);
 }
 .art {
   min-width: 0; min-height: 0;
-  background: radial-gradient(circle at 50% 40%, #534266, #231b30 65%);
+  background: radial-gradient(circle at 50% 40%, var(--art-glow), var(--art-background) 65%);
   display: flex; align-items: center; justify-content: center;
   position: relative; overflow: hidden;
 }
@@ -62,15 +126,15 @@ button { cursor: pointer; }
   pointer-events: none;
 }
 .art-image.is-visible { opacity: 1; }
-.art-placeholder { position: relative; z-index: 0; max-width: 75%; text-align: center; color: #c1adc9; line-height: 1.55; }
-.art-placeholder .symbol { display: block; font-family: Georgia, serif; font-size: clamp(3rem, 8vh, 6.5rem); color: #9570af; line-height: 1; }
+.art-placeholder { position: relative; z-index: 0; max-width: 75%; text-align: center; color: var(--placeholder-color); line-height: 1.55; }
+.art-placeholder .symbol { display: block; font-family: Georgia, serif; font-size: clamp(3rem, 8vh, 6.5rem); color: var(--symbol-color); line-height: 1; }
 
 .details { display: flex; min-width: 0; min-height: 0; flex-direction: column; overflow: hidden; padding: clamp(12px, 2.2vw, 34px); }
 .details > * { transition: opacity 160ms ease; }
 .details.text-swapping > * { opacity: 0; }
-.count { flex-shrink: 0; color: #c9a9df; font-size: .77rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+.count { flex-shrink: 0; color: var(--count-color); font-size: .77rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
 h2 { flex-shrink: 0; font-family: ui-serif, Georgia, serif; font-weight: 500; font-size: clamp(1.3rem, 2.7vw, 2.6rem); line-height: 1.15; margin: clamp(5px, 1vh, 12px) 0 0; }
-.rule { flex-shrink: 0; height: 1px; width: 100%; background: #544760; margin: clamp(10px, 2vh, 22px) 0; }
+.rule { flex-shrink: 0; height: 1px; width: 100%; background: var(--rule-color); margin: clamp(10px, 2vh, 22px) 0; }
 .story {
   min-height: 0;
   flex: 1 1 auto;
@@ -81,19 +145,52 @@ h2 { flex-shrink: 0; font-family: ui-serif, Georgia, serif; font-weight: 500; fo
   overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-gutter: stable;
-  color: #e4dce9;
+  color: var(--story-color);
   font-size: clamp(.86rem, 1.55vh, 1rem);
   line-height: 1.7;
 }
-.source { flex-shrink: 0; display: inline-block; margin-top: clamp(8px, 1.8vh, 24px); align-self: flex-start; color: #dfb9fc; text-decoration-thickness: 1px; text-underline-offset: 4px; font-size: .86rem; }
-.source:hover { color: #fff; }
+.source { flex-shrink: 0; display: inline-block; margin-top: clamp(8px, 1.8vh, 24px); align-self: flex-start; color: var(--link-color); text-decoration-thickness: 1px; text-underline-offset: 4px; font-size: .86rem; }
+.source:hover { color: var(--link-hover); }
 .controls { min-width: 0; display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
-.controls button, .controls select { min-height: 42px; border-radius: 12px; padding: 8px 14px; border: 1px solid #5e506c; background: #292136; color: #f8f4fb; }
-.controls button.primary { background: #dbb4fc; border-color: #dbb4fc; color: #21152c; font-weight: 800; }
+.controls button, .controls select { min-height: 42px; border-radius: 12px; padding: 8px 14px; border: 1px solid var(--control-border); background: var(--control-background); color: var(--control-color); }
+.controls button.primary { background: var(--primary-background); border-color: var(--primary-background); color: var(--primary-color); font-weight: 800; }
 .controls button:hover:not(:disabled), .controls select:hover:not(:disabled) { filter: brightness(1.1); }
 .controls button:disabled, .controls select:disabled { cursor: wait; opacity: .55; }
 .controls select { flex: 1; min-width: 160px; max-width: 390px; }
-button:focus-visible, select:focus-visible, a:focus-visible, .story:focus-visible { outline: 3px solid #e2bafa; outline-offset: 2px; }
+/* Accessible light-mode switch. It lives alongside the credit and version. */
+.controls .theme-switch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+  font-size: inherit;
+  font-weight: 650;
+}
+.theme-switch-track {
+  position: relative;
+  display: inline-block;
+  width: 33px;
+  height: 19px;
+  border-radius: 999px;
+  background: var(--switch-track);
+  flex: none;
+  transition: background-color 180ms ease;
+}
+.theme-switch-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: var(--switch-thumb);
+  box-shadow: 0 1px 2px #0003;
+  transition: transform 180ms ease;
+}
+.theme-switch[aria-checked="true"] .theme-switch-thumb { transform: translateX(14px); }
+button:focus-visible, select:focus-visible, a:focus-visible, .story:focus-visible { outline: 3px solid var(--focus-color); outline-offset: 2px; }
 
 /* Narrow screens keep the artwork visible above an independently scrolling story. */
 @media (max-width: 760px) {
@@ -103,6 +200,7 @@ button:focus-visible, select:focus-visible, a:focus-visible, .story:focus-visibl
   .controls { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; }
   .controls button { padding-inline: 6px; font-size: .83rem; }
   .controls select { grid-column: 1 / -1; width: 100%; max-width: none; min-width: 0; }
+  .controls .meta { grid-column: 1 / -1; width: 100%; margin-left: 0; }
 }
 @media (max-height: 540px) {
   .shell { gap: 5px; padding-block: 5px; }
@@ -148,8 +246,12 @@ button:focus-visible, select:focus-visible, a:focus-visible, .story:focus-visibl
         <option value="">Choose a transformation…</option>
       </select>
 	  <div class="meta">
-        <span>by <a href="https://www.deviantart.com/snugmew" target="_blank" rel="noopener noreferrer">smugmew</a></span>
-        <span id="app-version">v2026.11.18.1</span>
+        <span>by <a href="https://www.deviantart.com/smugmew" target="_blank" rel="noopener noreferrer">smugmew</a></span>
+        <button type="button" class="theme-switch" id="theme-switch" role="switch" aria-label="Light mode" aria-checked="false">
+		  <span aria-hidden="true">Light mode ☀️</span>
+          <span class="theme-switch-track" aria-hidden="true"><span class="theme-switch-thumb"></span></span>
+        </button>
+        <span id="app-version">v2026.11.18.2</span>
       </div>
     </div>
   </main>
@@ -165,8 +267,25 @@ button:focus-visible, select:focus-visible, a:focus-visible, .story:focus-visibl
     };
 
     // Update this whenever you publish a new version.
-    const APP_VERSION = "1.0.0";
+    const APP_VERSION = "1.1.0";
     document.getElementById("app-version").textContent = `v${APP_VERSION}`;
+
+    // Honor a saved choice, but leave dark as the default.
+    const themeSwitch = document.getElementById("theme-switch");
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    function applyTheme(theme) {
+      const light = theme === "light";
+      document.documentElement.dataset.theme = light ? "light" : "dark";
+      themeSwitch.setAttribute("aria-checked", String(light));
+      themeColorMeta.content = light ? "#faf8fd" : "#11101a";
+    }
+    applyTheme(document.documentElement.dataset.theme === "light" ? "light" : "dark");
+    themeSwitch.addEventListener("click", () => {
+      const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+      applyTheme(next);
+      try { localStorage.setItem("gam-color-theme", next); }
+      catch (error) { console.warn("Theme preference couldn't be saved", error); }
+    });
 
     const detailsEl = document.querySelector(".details");
     const imageLayers = [
