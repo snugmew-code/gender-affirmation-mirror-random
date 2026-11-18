@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#11101a">
+  <title>Gender Affirmation Mirror</title>
+  <style>
+
+:root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+body { margin: 0; color: #f4f0ff; background: radial-gradient(ellipse at 75% 0%, #302041 0, transparent 48%), #11101a; }
+button, select { font: inherit; }
+button { cursor: pointer; }
+
+/* Entire UI stays in the window. Only .story may scroll. */
+.shell {
+  width: min(100%, 1600px);
+  height: 100vh;  /* fallback for older browsers */
+  height: 100dvh; /* accounts for mobile browser chrome */
+  margin: 0 auto;
+  padding: clamp(7px, 1.4vh, 16px) clamp(9px, 2vw, 24px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(6px, 1.1vh, 14px);
+  min-height: 0;
+}
+.masthead { display: flex; flex-direction: column; align-items: center; gap: clamp(3px, .6vh, 8px); min-height: 0; }
+.meta { display: flex; align-items: center; justify-content: space-between; align-self: stretch; gap: 16px; color: #bcaecb; font-size: clamp(.68rem, 1.5vh, .83rem); line-height: 1.2; }
+.meta a { color: #dfb9fc; text-underline-offset: 3px; }
+.meta a:hover { color: #fff; }
+.logo { display: block; width: auto; height: clamp(28px, 10vh, 104px); max-width: 100%; object-fit: contain; }
+
+.viewer {
+  min-height: 0; height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+  border: 1px solid #4e405c;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #201a2a;
+  box-shadow: 0 18px 60px #0005;
+}
+.art {
+  min-width: 0; min-height: 0;
+  background: radial-gradient(circle at 50% 40%, #534266, #231b30 65%);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.art-image {
+  position: absolute;
+  top: 50%; left: 0;
+  width: 100%;
+  height: min(100%, 1312px); /* fixed 1312px canvas, downscaled if needed */
+  transform: translateY(-50%);
+  object-fit: contain;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 650ms ease-in-out;
+  pointer-events: none;
+}
+.art-image.is-visible { opacity: 1; }
+.art-placeholder { position: relative; z-index: 0; max-width: 75%; text-align: center; color: #c1adc9; line-height: 1.55; }
+.art-placeholder .symbol { display: block; font-family: Georgia, serif; font-size: clamp(3rem, 8vh, 6.5rem); color: #9570af; line-height: 1; }
+
+.details { display: flex; min-width: 0; min-height: 0; flex-direction: column; overflow: hidden; padding: clamp(12px, 2.2vw, 34px); }
+.details > * { transition: opacity 160ms ease; }
+.details.text-swapping > * { opacity: 0; }
+.count { flex-shrink: 0; color: #c9a9df; font-size: .77rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+h2 { flex-shrink: 0; font-family: ui-serif, Georgia, serif; font-weight: 500; font-size: clamp(1.3rem, 2.7vw, 2.6rem); line-height: 1.15; margin: clamp(5px, 1vh, 12px) 0 0; }
+.rule { flex-shrink: 0; height: 1px; width: 100%; background: #544760; margin: clamp(10px, 2vh, 22px) 0; }
+.story {
+  min-height: 0;
+  flex: 1 1 auto;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  color: #e4dce9;
+  font-size: clamp(.86rem, 1.55vh, 1rem);
+  line-height: 1.7;
+}
+.source { flex-shrink: 0; display: inline-block; margin-top: clamp(8px, 1.8vh, 24px); align-self: flex-start; color: #dfb9fc; text-decoration-thickness: 1px; text-underline-offset: 4px; font-size: .86rem; }
+.source:hover { color: #fff; }
+.controls { min-width: 0; display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
+.controls button, .controls select { min-height: 42px; border-radius: 12px; padding: 8px 14px; border: 1px solid #5e506c; background: #292136; color: #f8f4fb; }
+.controls button.primary { background: #dbb4fc; border-color: #dbb4fc; color: #21152c; font-weight: 800; }
+.controls button:hover:not(:disabled), .controls select:hover:not(:disabled) { filter: brightness(1.1); }
+.controls button:disabled, .controls select:disabled { cursor: wait; opacity: .55; }
+.controls select { flex: 1; min-width: 160px; max-width: 390px; }
+button:focus-visible, select:focus-visible, a:focus-visible, .story:focus-visible { outline: 3px solid #e2bafa; outline-offset: 2px; }
+
+/* Narrow screens keep the artwork visible above an independently scrolling story. */
+@media (max-width: 760px) {
+  .viewer { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 42%) minmax(0, 1fr); border-radius: 16px; }
+  .details { padding: clamp(10px, 2vw, 18px); }
+  h2 { font-size: clamp(1.25rem, 4vw, 1.75rem); }
+  .controls { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; }
+  .controls button { padding-inline: 6px; font-size: .83rem; }
+  .controls select { grid-column: 1 / -1; width: 100%; max-width: none; min-width: 0; }
+}
+@media (max-height: 540px) {
+  .shell { gap: 5px; padding-block: 5px; }
+  .logo { height: clamp(22px, 7vh, 48px); }
+  .details { padding: 10px 14px; }
+  .rule { margin: 7px 0; }
+  .source { margin-top: 6px; }
+  .controls button, .controls select { min-height: 34px; padding-block: 5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <img class="logo" src="./images/logo.png" alt="Gender Affirmation Mirror">
+    </header>
+
+    <section id="viewer" class="viewer" aria-label="Transformation viewer">
+      <div class="art">
+        <img id="art-image-a" class="art-image" alt="">
+        <img id="art-image-b" class="art-image" alt="">
+        <div id="art-placeholder" class="art-placeholder">
+          <span class="symbol" aria-hidden="true">✧</span>
+          <span id="art-placeholder-text">Your next transformation awaits.</span>
+        </div>
+      </div>
+      <div class="details">
+        <div id="count" class="count">The beginning</div>
+        <h2 id="title">Who will you become?</h2>
+        <div class="rule"></div>
+        <div id="story" class="story" tabindex="0" role="region" aria-label="Transformation story">Your transformation hasn't begun yet. Choose at random to discover what comes next.</div>
+        <a id="source" class="source" href="#" target="_blank" rel="noopener noreferrer" hidden>Open original on DeviantArt ↗</a>
+      </div>
+    </section>
+
+    <div class="controls">
+      <button type="button" class="primary" id="random" disabled>🎲 Random transformation</button>
+      <button type="button" id="reset">↺ Reset</button>
+      <select id="choose" aria-label="Choose transformation" disabled>
+        <option value="">Choose a transformation…</option>
+      </select>
+	  <div class="meta">
+        <span>by <a href="https://www.deviantart.com/snugmew" target="_blank" rel="noopener noreferrer">smugmew</a></span>
+        <span id="app-version">v1.0.0</span>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // The starting illustration is automatically loaded from images/0.*
+    // and the starting story from descriptions/0.txt.
+    const intro = {
+      id: 0,                    // reads descriptions/0.txt
+      name: "Who will you become?",
+      url: "",                  // optional: link to the original deviation
+      description: "Your transformation hasn't begun yet. Choose at random to discover what comes next."
+    };
+
+    // Update this whenever you publish a new version.
+    const APP_VERSION = "1.0.0";
+    document.getElementById("app-version").textContent = `v${APP_VERSION}`;
+
+    const detailsEl = document.querySelector(".details");
+    const imageLayers = [
+      document.getElementById("art-image-a"),
+      document.getElementById("art-image-b")
+    ];
+    let activeImageLayer = null;
+    const imagePlaceholder = document.getElementById("art-placeholder");
+    const imagePlaceholderText = document.getElementById("art-placeholder-text");
+    const titleEl = document.getElementById("title");
+    const countEl = document.getElementById("count");
+    const storyEl = document.getElementById("story");
+    const sourceEl = document.getElementById("source");
+    const randomBtn = document.getElementById("random");
+    const resetBtn = document.getElementById("reset");
+    const chooseEl = document.getElementById("choose");
+
+    const storageKey = "transformation-viewer-shuffle-v1";
+    // Local images are named by ID, e.g. images/1.png or images/1.webp.
+    // If an entry has an explicit `image` path in JSON, use that instead.
+    const imageExtensions = ["webp", "png", "jpg", "jpeg", "gif", "avif"];
+    const imageCache = new Map();
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+    const IMAGE_FADE_MS = 650;
+    const TEXT_FADE_MS = 160;
+    const prefersReducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+    let transformations = [];
+    let shuffleState = null;
+    let renderToken = 0;
+
+    function setBusy(busy) {
+      randomBtn.disabled = busy || transformations.length === 0;
+      chooseEl.disabled = busy || transformations.length === 0;
+      resetBtn.disabled = busy;
+    }
+
+    function shuffled(items) {
+      const result = [...items];
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
+      return result;
+    }
+
+    function saveState() {
+      try { localStorage.setItem(storageKey, JSON.stringify(shuffleState)); }
+      catch (error) { console.warn("Shuffle history couldn't be saved", error); }
+    }
+
+    function initShuffleState() {
+      // Stable IDs mean changing text or adding a description won't reset the bag.
+      const signature = JSON.stringify(transformations.map(t => t.id));
+      try { shuffleState = JSON.parse(localStorage.getItem(storageKey)); }
+      catch { shuffleState = null; }
+      if (!shuffleState || shuffleState.signature !== signature ||
+          !Array.isArray(shuffleState.remaining)) {
+        shuffleState = { signature, remaining: [], last: null };
+      }
+      const valid = new Set(transformations.map(t => String(t.id)));
+      shuffleState.remaining = [...new Set(shuffleState.remaining.map(String))]
+        .filter(id => valid.has(id));
+      if (!valid.has(String(shuffleState.last))) shuffleState.last = null;
+      saveState();
+    }
+
+    function drawRandom() {
+      if (shuffleState.remaining.length === 0) {
+        shuffleState.remaining = shuffled(transformations.map(t => String(t.id)));
+        // pop() is the next draw, so keep the previous draw off the end.
+        const lastPos = shuffleState.remaining.length - 1;
+        if (lastPos > 0 && shuffleState.remaining[lastPos] === shuffleState.last) {
+          [shuffleState.remaining[0], shuffleState.remaining[lastPos]] =
+            [shuffleState.remaining[lastPos], shuffleState.remaining[0]];
+        }
+      }
+      const id = shuffleState.remaining.pop();
+      shuffleState.last = id;
+      saveState();
+      return transformations.find(t => String(t.id) === id);
+    }
+
+    function chooseManually(entry) {
+      // Manual choices also count as having used that entry during this bag.
+      shuffleState.remaining = shuffleState.remaining.filter(id => id !== String(entry.id));
+      shuffleState.last = String(entry.id);
+      saveState();
+    }
+
+    function tryImage(path) {
+      return new Promise(resolve => {
+        const img = new Image();
+        let done = false;
+        const timeout = setTimeout(() => finish(false), 6000);
+        function finish(ok) {
+          if (done) return;
+          done = true;
+          clearTimeout(timeout);
+          img.onload = null;
+          img.onerror = null;
+          resolve(ok ? path : "");
+        }
+        img.onload = () => finish(true);
+        img.onerror = () => finish(false);
+        img.src = path;
+      });
+    }
+
+    function preloadedImage(entry) {
+      const id = String(entry.id);
+      const explicitPath = typeof entry.image === "string" && entry.image.trim();
+      const key = explicitPath || id;
+      if (!imageCache.has(key)) {
+        const paths = explicitPath ? [entry.image.trim()] :
+          imageExtensions.map(ext => `./images/${encodeURIComponent(id)}.${ext}`);
+        // Missing file extensions simply produce a 404 and we try the next.
+        const result = (async () => {
+          for (const path of paths) {
+            const found = await tryImage(path);
+            if (found) return found;
+          }
+          return "";
+        })();
+        imageCache.set(key, result);
+      }
+      return imageCache.get(key);
+    }
+
+    async function descriptionFor(entry) {
+      // Each transformation's text lives in descriptions/<id>.txt.
+      // Using the JSON ID keeps text and links in sync as the list grows.
+      const fallback = entry.description ||
+        "This story hasn't been added to the viewer yet.";
+      if (entry.id === undefined || entry.id === null) return fallback;
+      try {
+        const path = `./descriptions/${encodeURIComponent(String(entry.id))}.txt`;
+        const response = await fetch(path, { cache: "no-cache" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const story = (await response.text()).trim();
+        return story || fallback;
+      } catch (error) {
+        console.warn(`Description unavailable for #${entry.id}`, error);
+        return fallback;
+      }
+    }
+
+
+async function show(entry, isIntro = false) {
+  const token = ++renderToken;
+  setBusy(true);
+  try {
+    // Load the next story and picture before changing anything on screen.
+    const [url, story] = await Promise.all([
+      preloadedImage(entry),
+      descriptionFor(entry)
+    ]);
+    if (token !== renderToken) return;
+
+    const animate = !prefersReducedMotion.matches;
+    if (animate) {
+      detailsEl.classList.add("text-swapping");
+      await delay(TEXT_FADE_MS);
+    }
+    if (token !== renderToken) return;
+
+    titleEl.textContent = entry.name;
+    countEl.textContent = isIntro ? "The beginning" : `Transformation #${entry.id}`;
+    storyEl.textContent = story;
+    storyEl.scrollTop = 0;
+    sourceEl.hidden = !entry.url;
+    if (entry.url) sourceEl.href = entry.url;
+    chooseEl.value = isIntro ? "" : String(entry.id);
+    detailsEl.classList.remove("text-swapping");
+
+    if (url) {
+      // Incoming image overlays the old one while its opacity goes 0 → 1.
+      const incoming = imageLayers.find(layer => layer !== activeImageLayer);
+      const outgoing = activeImageLayer;
+      incoming.classList.remove("is-visible");
+      incoming.style.zIndex = "2";
+      if (outgoing) outgoing.style.zIndex = "1";
+      incoming.src = url;
+      incoming.alt = `Illustration: ${entry.name}`;
+      imagePlaceholder.hidden = true;
+      // Force the invisible frame to paint before beginning the crossfade.
+      void incoming.offsetWidth;
+      incoming.classList.add("is-visible");
+      if (animate) await delay(IMAGE_FADE_MS);
+      if (token !== renderToken) return;
+      if (outgoing) {
+        // The new image is now fully opaque: hide the old one immediately,
+        // rather than letting its edges linger during a second fade.
+        outgoing.style.transition = "none";
+        outgoing.classList.remove("is-visible");
+        void outgoing.offsetWidth;
+        outgoing.style.transition = "";
+      }
+      activeImageLayer = incoming;
+    } else {
+      imagePlaceholderText.textContent = isIntro ?
+        "Your next transformation awaits." : "Illustration coming soon.";
+      imagePlaceholder.hidden = false;
+      if (activeImageLayer) {
+        activeImageLayer.classList.remove("is-visible");
+        if (animate) await delay(IMAGE_FADE_MS);
+        if (token !== renderToken) return;
+        activeImageLayer = null;
+      }
+    }
+  } catch (error) {
+    console.error("Could not display transformation", error);
+    detailsEl.classList.remove("text-swapping");
+  } finally {
+    if (token === renderToken) setBusy(false);
+  }
+}
+
+    randomBtn.addEventListener("click", () => {
+      if (!transformations.length || randomBtn.disabled) return;
+      const entry = drawRandom();
+      if (entry) show(entry);
+    });
+
+    resetBtn.addEventListener("click", () => {
+      // Reset the visible scene, not the shuffle history.
+      // This preserves the no-repeat promise across visits to the intro.
+      show(intro, true);
+    });
+
+    chooseEl.addEventListener("change", () => {
+      const entry = transformations.find(t => String(t.id) === chooseEl.value);
+      if (entry) { chooseManually(entry); show(entry); }
+      else show(intro, true);
+    });
+
+    async function init() {
+      try {
+        const response = await fetch("./transformations.json", { cache: "no-cache" });
+        if (!response.ok) throw new Error(`JSON request returned ${response.status}`);
+        const all = await response.json();
+        if (!Array.isArray(all)) throw new Error("transformations.json must contain an array");
+        transformations = all.filter(t => t && t.enabled !== false &&
+          Number.isSafeInteger(t.id) && t.id > 0 &&
+          typeof t.name === "string" && t.name.trim());
+        if (!transformations.length) throw new Error("No enabled transformations found");
+        initShuffleState();
+        for (const t of transformations) {
+          const option = document.createElement("option");
+          option.value = String(t.id);
+          option.textContent = `#${t.id} — ${t.name}`;
+          chooseEl.appendChild(option);
+        }
+        await show(intro, true);
+      } catch (error) {
+        console.error(error);
+        setBusy(false);
+      }
+    }
+    init();
+  </script>
+</body>
+</html>
