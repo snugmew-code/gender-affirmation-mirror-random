@@ -219,6 +219,12 @@ button:focus-visible, select:focus-visible, a:focus-visible, .story:focus-visibl
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+.story abbr[title] {
+  text-decoration: underline dotted;
+  text-decoration-color: var(--count-color);
+  text-underline-offset: 4px;
+  cursor: help;
+}
   </style>
 </head>
 <body>
@@ -273,7 +279,7 @@ button:focus-visible, select:focus-visible, a:focus-visible, .story:focus-visibl
     };
 
     // Update this whenever you publish a new version.
-    const APP_VERSION = "2026.11.18.3";
+    const APP_VERSION = "2026.11.18.4";
     document.getElementById("app-version").textContent = `v${APP_VERSION}`;
 
     // Honor a saved choice, but leave dark as the default.
@@ -459,7 +465,7 @@ async function show(entry, isIntro = false) {
 
     titleEl.textContent = entry.name;
     countEl.textContent = isIntro ? "The beginning" : `Transformation #${entry.id}`;
-    storyEl.textContent = story;
+    storyEl.innerHTML  = story;
     storyEl.scrollTop = 0;
     sourceEl.hidden = !entry.url;
     if (entry.url) sourceEl.href = entry.url;
