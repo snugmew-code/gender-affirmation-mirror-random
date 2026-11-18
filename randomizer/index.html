@@ -9,7 +9,7 @@
 
         <script>
             async function loadTransformations() {
-                const response = await fetch("./transformations.json");
+                const response = await fetch("../transformations.json");
                 if (!response.ok) {
                     throw new Error("Could not load transformations.json");
                 }
